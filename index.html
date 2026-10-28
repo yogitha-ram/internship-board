@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Internship Board</title>
+<style>
+  :root {
+    --bg: #f5f7fb;
+    --ink: #14213d;
+    --muted: #5b6678;
+    --card: #ffffff;
+    --line: #dde3ee;
+    --accent: #1f4fd8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+  }
+  header {
+    padding: 2rem 1rem 1rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  h1 { margin: 0 0 .25rem; font-size: 1.8rem; }
+  header p { margin: 0; color: var(--muted); }
+  .controls {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 1rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: .75rem;
+  }
+  .controls input, .controls select {
+    padding: .7rem .9rem;
+    font-size: 1rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--ink);
+  }
+  .controls input:focus, .controls select:focus, .apply:focus-visible {
+    outline: 3px solid #9db6ff;
+    outline-offset: 1px;
+  }
+  .grid {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 1rem 2rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: .4rem;
+  }
+  .card h2 { margin: 0; font-size: 1.15rem; }
+  .company { font-weight: 600; color: var(--accent); }
+  .meta { color: var(--muted); font-size: .92rem; }
+  .tag {
+    align-self: flex-start;
+    font-size: .8rem;
+    padding: .15rem .6rem;
+    border: 1px solid var(--line);
+    border-radius: 99px;
+    color: var(--muted);
+  }
+  .apply {
+    margin-top: auto;
+    padding: .65rem;
+    text-align: center;
+    text-decoration: none;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 8px;
+    font-weight: 600;
+  }
+  .empty { grid-column: 1 / -1; color: var(--muted); padding: 1rem 0; }
+
+  /* Tablet: 2 columns */
+  @media (min-width: 640px) {
+    .controls { flex-direction: row; }
+    .controls input { flex: 1; }
+    .grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  /* Desktop: 3 columns */
+  @media (min-width: 1000px) {
+    .grid { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Internship Board</h1>
+    <p>Find an internship that fits your skills.</p>
+  </header>
+
+  <div class="controls">
+    <input id="search" type="search" placeholder="Search by role or company" aria-label="Search internships">
+    <select id="mode" aria-label="Filter by work mode">
+      <option value="all">All work modes</option>
+      <option value="Remote">Remote</option>
+      <option value="Hybrid">Hybrid</option>
+      <option value="On-site">On-site</option>
+    </select>
+  </div>
+
+  <main class="grid" id="grid"></main>
+
+<script>
+  // Replace these with real or sample listings of your choice
+  const internships = [
+    { title: "Frontend Developer Intern", company: "BrightByte", location: "Chennai", mode: "Hybrid", duration: "3 months" },
+    { title: "Data Analyst Intern", company: "InsightWorks", location: "Remote", mode: "Remote", duration: "2 months" },
+    { title: "Python Developer Intern", company: "CodeNest", location: "Madurai", mode: "On-site", duration: "3 months" },
+    { title: "UI/UX Design Intern", company: "PixelCraft", location: "Bengaluru", mode: "Hybrid", duration: "4 months" },
+    { title: "Machine Learning Intern", company: "NeuralPath", location: "Remote", mode: "Remote", duration: "6 months" },
+    { title: "Full Stack Intern (MERN)", company: "StackForge", location: "Coimbatore", mode: "On-site", duration: "3 months" },
+    { title: "Dashboard Developer Intern", company: "ChartLab", location: "Chennai", mode: "Hybrid", duration: "2 months" }
+  ];
+
+  const grid = document.getElementById("grid");
+  const search = document.getElementById("search");
+  const mode = document.getElementById("mode");
+
+  function render(list) {
+    grid.innerHTML = "";
+    if (list.length === 0) {
+      grid.innerHTML = '<p class="empty">No internships match your search. Try a different keyword or filter.</p>';
+      return;
+    }
+    list.forEach(item => {
+      const card = document.createElement("article");
+      card.className = "card";
+      card.innerHTML = `
+        <span class="tag">${item.mode}</span>
+        <h2>${item.title}</h2>
+        <div class="company">${item.company}</div>
+        <div class="meta">${item.location} &bull; ${item.duration}</div>
+        <a class="apply" href="#" onclick="alert('Application sent to ${item.company}!'); return false;">Apply</a>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  function applyFilters() {
+    const q = search.value.trim().toLowerCase();
+    const m = mode.value;
+    const result = internships.filter(i =>
+      (m === "all" || i.mode === m) &&
+      (i.title.toLowerCase().includes(q) || i.company.toLowerCase().includes(q))
+    );
+    render(result);
+  }
+
+  search.addEventListener("input", applyFilters);
+  mode.addEventListener("change", applyFilters);
+  render(internships);
+</script>
+</body>
+</html>
